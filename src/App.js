@@ -6,12 +6,16 @@ import { NotConnected } from "./NotConnected";
 
 import "./App.css";
 
+import { getGifList } from "./utils/solana"
+
 // Constants
 const TWITTER_HANDLE = "_buildspace";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
   const [walletAddress, setWalletAddress] = useState(null);
+  const [gifList, setGifList] = useState([]);
+
   /**
    * Checking if phantom wallet is connected or not
    */
@@ -37,15 +41,18 @@ const App = () => {
     }
   };
 
-  /*
-   * When our component first mounts, let's check to see if we have a connected
-   * Phantom Wallet
-   */
   useEffect(() => {
     window.addEventListener("load", async (event) => {
       await checkIfWalletIsConnected();
     });
   }, []);
+
+  useEffect(() => {
+    if (walletAddress) {
+      console.log("Fetching GIF list...");
+      getGifList(setGifList);
+    }
+  }, [walletAddress]);
 
   return (
     <div className="App">
@@ -56,7 +63,7 @@ const App = () => {
             View my goat collection protected by the metaverse ✨
           </p>
           {walletAddress ? (
-            <Connected />
+            <Connected gifList={gifList} setGifList={setGifList}/>
           ) : (
             <NotConnected setWalletAddress={setWalletAddress} />
           )}
